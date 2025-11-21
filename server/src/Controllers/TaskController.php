@@ -41,7 +41,20 @@ class TaskController {
         $stmt->execute([$user['group_id'], $date]);
         $task = $stmt->fetch();
 
-        echo json_encode(['tasks' => $task ? json_decode($task['task_json']) : null]);
+        if ($task) {
+            // Convert {"Brooming":"Sumit"} to [{task_name:"Brooming", assigned_to_name:"Sumit"}]
+            $taskObj = json_decode($task['task_json'], true);
+            $taskArray = [];
+            foreach ($taskObj as $taskName => $assignedTo) {
+                $taskArray[] = [
+                    'task_name' => $taskName,
+                    'assigned_to_name' => $assignedTo
+                ];
+            }
+            echo json_encode(['tasks' => $taskArray]);
+        } else {
+            echo json_encode(['tasks' => []]);
+        }
     }
 
     public function assign() {

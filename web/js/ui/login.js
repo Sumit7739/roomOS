@@ -1,5 +1,7 @@
 import { apiCall } from '../api.js';
 import { navigate } from '../app.js';
+import { updateState } from '../state.js';
+import { showToast } from './toast.js';
 
 export function renderLogin() {
     const container = document.getElementById('view-container');
@@ -76,17 +78,24 @@ export function renderLogin() {
         try {
             if (isLogin) {
                 const res = await apiCall('/auth/login', 'POST', { email, password });
-                localStorage.setItem('token', res.token);
-                localStorage.setItem('user', JSON.stringify(res.user));
+                updateState('token', res.token);
+                updateState('user', res.user);
+                if (res.user.group_id) {
+                    updateState('group', { id: res.user.group_id });
+                }
+                showToast('Login Successful!', 'success');
                 navigate('dashboard');
             } else {
+                if (!name || !email || !password) {
+                    showToast('Please fill all fields', 'error');
+                    return;
+                }
                 await apiCall('/auth/register', 'POST', { name, email, password });
-                alert('Account created! Please login.');
-                // Switch to login mode
+                showToast('Registration Successful! Please Login.', 'success');
                 toggleBtn.click();
             }
         } catch (error) {
-            alert(error.message);
+            showToast(error.message, 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = isLogin ? 'Login' : 'Register';

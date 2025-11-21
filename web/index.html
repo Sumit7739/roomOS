@@ -5,42 +5,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RoomOS</title>
-
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Styles -->
+    <title>RoomOS</title>
     <link rel="stylesheet" href="css/style.css">
-
-    <!-- Manifest for PWA -->
     <link rel="manifest" href="manifest.json">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
     <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>RoomOS</h1>
+            <div style="display: flex; gap: var(--space-sm); align-items: center;">
+                <button id="profile-btn" class="icon-btn" onclick="app.navigate('profile')" title="Profile">
+                    <i class="ph ph-user-circle"></i>
+                </button>
+                <button id="theme-toggle" class="icon-btn" onclick="app.toggleTheme()" title="Toggle Theme">
+                    <i class="ph ph-moon"></i>
+                </button>
+            </div>
+        </header>
         <!-- Views will be injected here -->
         <div id="view-container" class="p-4"></div>
 
         <!-- Bottom Navigation (Hidden on Login) -->
-        <nav id="bottom-nav" class="bottom-nav hidden">
-            <div class="nav-item active" data-target="dashboard">
-                <span class="nav-icon">🏠</span>
+        <!-- Bottom Nav -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-target="dashboard" onclick="app.navigate('dashboard')">
+                <i class="ph ph-house nav-icon"></i>
                 <span>Home</span>
-            </div>
-            <div class="nav-item" data-target="roster">
-                <span class="nav-icon">📅</span>
-                <span>Roster</span>
-            </div>
-            <div class="nav-item" data-target="chat">
-                <span class="nav-icon">💬</span>
+            </button>
+            <button class="nav-item" data-target="roster" onclick="app.navigate('roster')">
+                <i class="ph ph-calendar nav-icon"></i>
+                <span>Plan</span>
+            </button>
+            <button class="nav-item" data-target="crew" onclick="app.navigate('crew')">
+                <i class="ph ph-users nav-icon"></i>
+                <span>Crew</span>
+            </button>
+            <button class="nav-item" data-target="rules" onclick="app.navigate('rules')">
+                <i class="ph ph-scroll nav-icon"></i>
+                <span>Rules</span>
+            </button>
+            <button class="nav-item" data-target="transactions" onclick="app.navigate('transactions')">
+                <i class="ph ph-currency-dollar nav-icon"></i>
+                <span>Money</span>
+            </button>
+            <button class="nav-item" data-target="chat" onclick="app.navigate('chat')">
+                <i class="ph ph-chat-circle nav-icon"></i>
                 <span>Chat</span>
-            </div>
-            <div class="nav-item" data-target="transactions">
-                <span class="nav-icon">💸</span>
-                <span>Pay</span>
-            </div>
+            </button>
         </nav>
     </div>
 

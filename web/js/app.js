@@ -2,19 +2,26 @@ import { renderLogin } from './ui/login.js';
 import { renderGroupSetup } from './ui/group_setup.js';
 import { renderDashboard } from './ui/dashboard.js';
 import { renderRoster } from './ui/roster.js';
+import { renderCrew } from './ui/crew.js';
+import { renderRules } from './ui/rules.js';
+import { renderProfile } from './ui/profile.js';
 import { renderTransactions } from './ui/transactions.js';
 import { renderChat, stopChatPolling } from './ui/chat.js';
+import { getState, updateState } from './state.js';
+import { showToast } from './ui/toast.js';
 import './sync.js'; // Start sync listener
 
-// Simple State
-const state = {
-    user: JSON.parse(localStorage.getItem('user')) || null,
-    token: localStorage.getItem('token') || null
+// Expose app to window for global access (e.g. onclick in HTML)
+window.app = {
+    navigate: navigate,
+    toggleTheme: toggleTheme,
+    showToast: showToast
 };
 
 // Router
 export function navigate(view) {
     const container = document.getElementById('view-container');
+    const state = getState();
     const nav = document.getElementById('bottom-nav');
 
     // Clear current view
@@ -25,36 +32,42 @@ export function navigate(view) {
         view = 'login';
     }
 
-    // Handle Group Guard
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user && !user.group_id && view !== 'login') {
-        // If logged in but no group, force group setup
-        // We'll handle this by rendering group setup directly if view is dashboard
-        if (view === 'dashboard' || view === 'roster' || view === 'chat' || view === 'transactions') {
-            renderGroupSetup();
-            // Show nav but maybe disable items? For now let's hide nav
-            nav.classList.add('hidden');
-            return;
-        }
+    console.log('Navigating to:', view);
+    console.log('Current State:', state);
+
+    // Auth Guard
+    if (!state.token && view !== 'login') {
+        console.log('Auth Guard Blocked');
+        renderLogin();
+        return;
     }
 
-    // Show/Hide Nav
-    if (view === 'login') {
-        nav.classList.add('hidden');
-    } else {
-        nav.classList.remove('hidden');
-        updateActiveNav(view);
+    // Group Guard
+    if (state.token && !state.group && view !== 'group_setup' && view !== 'login') {
+        console.log('Group Guard Blocked. Token exists but no Group.');
+        renderGroupSetup();
+        return;
     }
 
-    // Cleanup Chat Poll if leaving chat
+    // Update Nav Active State
+    document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.target === view);
+    });
+
+    // Stop Chat Polling if leaving chat
     if (view !== 'chat') {
         stopChatPolling();
     }
 
-    // Render View
+    // Clear current view
+    container.innerHTML = '';
+
     switch (view) {
         case 'login':
             renderLogin();
+            break;
+        case 'group_setup':
+            renderGroupSetup();
             break;
         case 'dashboard':
             renderDashboard();
@@ -62,17 +75,29 @@ export function navigate(view) {
         case 'roster':
             renderRoster();
             break;
-        case 'chat':
-            renderChat();
+        case 'crew':
+            renderCrew();
+            break;
+        case 'rules':
+            renderRules();
+            break;
+        case 'profile':
+            renderProfile();
             break;
         case 'transactions':
             renderTransactions();
             break;
+        case 'chat':
+            renderChat();
+            break;
         default:
-            renderLogin();
+            renderDashboard();
     }
 }
 
+// The updateActiveNav function is no longer needed as its logic is now inline within navigate.
+// However, to maintain the structure of the original file, we'll keep the function definition
+// but it will not be called from navigate anymore.
 function updateActiveNav(view) {
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
@@ -80,6 +105,21 @@ function updateActiveNav(view) {
             item.classList.add('active');
         }
     });
+}
+
+// Theme Logic
+function toggleTheme() {
+    const body = document.body;
+    const current = body.getAttribute('data-theme') || 'dark';
+    const next = current === 'light' ? 'dark' : 'light';
+    body.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+
+    // Update Icon
+    const icon = document.querySelector('#theme-toggle i');
+    if (icon) {
+        icon.className = next === 'light' ? 'ph ph-sun' : 'ph ph-moon';
+    }
 }
 
 // Init
@@ -90,6 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
             navigate(item.dataset.target);
         });
     });
+
+    // Init Theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+    if (document.querySelector('#theme-toggle i')) {
+        document.querySelector('#theme-toggle i').className = savedTheme === 'dark' ? 'ph ph-moon' : 'ph ph-sun';
+    }
+
+    const state = getState();
 
     // Initial Route
     if (state.token) {

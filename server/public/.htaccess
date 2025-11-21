@@ -2,9 +2,7 @@
     RewriteEngine On
     
     # Handle Cross Origin Resource Sharing
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    # Handled in PHP index.php
 
     # Send everything to index.php
     RewriteCond %{REQUEST_FILENAME} !-d
