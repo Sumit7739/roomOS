@@ -1,4 +1,5 @@
 import { apiCall } from '../api.js';
+import { showToast } from './toast.js';
 
 export async function renderTransactions() {
     const container = document.getElementById('view-container');
@@ -90,18 +91,19 @@ export async function renderTransactions() {
 
         saveBtn.addEventListener('click', async () => {
             const desc = document.getElementById('desc').value;
-            const amount = document.getElementById('amount').value;
-
-            if (!desc || !amount) return alert('Please fill all fields');
+            const amount = document.getElementById('t-amount').value;
+            if (!desc || !amount) return showToast('Please fill all fields', 'error');
 
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
 
             try {
+                const token = localStorage.getItem('token');
                 await apiCall('/transactions/add', 'POST', { description: desc, amount }, token);
+                showToast('Expense Added', 'success');
                 renderTransactions(); // Refresh
             } catch (e) {
-                alert(e.message);
+                showToast(e.message, 'error');
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Save';
             }

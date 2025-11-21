@@ -1,18 +1,23 @@
-const CACHE_NAME = 'roomos-v1';
+const CACHE_NAME = 'roomos-v3';
 const ASSETS = [
     './',
     './index.html',
     './css/style.css',
     './js/app.js',
     './js/api.js',
+    './js/state.js',
     './js/store.js',
     './js/sync.js',
     './js/ui/login.js',
     './js/ui/group_setup.js',
     './js/ui/dashboard.js',
     './js/ui/roster.js',
+    './js/ui/crew.js',
+    './js/ui/rules.js',
+    './js/ui/profile.js',
     './js/ui/transactions.js',
     './js/ui/chat.js',
+    './js/ui/toast.js',
     './manifest.json'
 ];
 

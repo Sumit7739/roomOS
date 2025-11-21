@@ -1,4 +1,5 @@
 import { apiCall } from '../api.js';
+import { showToast } from './toast.js';
 
 export async function renderRoster() {
     const container = document.getElementById('view-container');
@@ -8,33 +9,61 @@ export async function renderRoster() {
         const token = localStorage.getItem('token');
         const res = await apiCall('/roster/week', 'GET', null, token);
         const roster = res.roster;
-        const isAdmin = res.role === 'admin';
+        const isAdmin = res.role === 'admin'; // Or allow everyone to edit if desired
 
         const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const todayIndex = (new Date().getDay() + 6) % 7; // Mon=0
 
         let html = `
             <div class="fade-in" style="padding-bottom: 80px;">
-                <h1 class="mb-4">Weekly Roster</h1>
-                ${isAdmin ? '<p class="mb-4" style="font-size: 0.8rem; color: var(--accent-primary);">Tap a day to edit</p>' : ''}
-                <div class="roster-grid">
+                <div style="text-align:center; margin-bottom:15px; color:var(--text-secondary); font-size:0.8rem;">
+                    Tap a day to edit plan
+                </div>
+                <div id="roster-list">
         `;
 
         roster.forEach(day => {
-            const morning = JSON.parse(day.morning || '[]');
-            const night = JSON.parse(day.night || '[]');
+            // Parse data. It might be ["Name"] or [{"n":"Name","t":"Time"}]
+            let morning = JSON.parse(day.morning || '[]');
+            let night = JSON.parse(day.night || '[]');
+
+            // Normalize to objects
+            morning = morning.map(x => typeof x === 'string' ? { n: x, t: '' } : x);
+            night = night.map(x => typeof x === 'string' ? { n: x, t: '' } : x);
+
             const dayName = days[day.day_index];
+            const isToday = day.day_index === todayIndex ? 'today-glow' : '';
+            const todayBadge = day.day_index === todayIndex ? '<span class="today-tag">TODAY</span>' : '';
+
+            // Helper to make pills
+            const makePills = (arr) => arr.map(x =>
+                `<div class="worker-chip"><span>${x.n}</span><span class="time-tiny">${x.t || ''}</span></div>`
+            ).join('');
 
             html += `
-                <div class="card mb-4 ${isAdmin ? 'editable-day' : ''}" data-day="${day.day_index}">
-                    <h3 class="mb-2" style="color: var(--text-secondary);">${dayName}</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
-                            <div style="font-size: 0.8rem; color: var(--warning); margin-bottom: 4px;">MORNING</div>
-                            ${morning.length ? morning.join(', ') : '-'}
+                <div class="roster-card ${isToday} editable-day" data-day="${day.day_index}">
+                    <div class="roster-header">
+                        <span>${dayName}</span>
+                        ${todayBadge}
+                    </div>
+                    
+                    <div class="shift-row morning">
+                        <div class="shift-label-row">
+                            <span class="shift-icon">☀️ Morning</span>
+                            ${day.passenger_m ? `<span class="pass-tag">🚫 ${day.passenger_m}</span>` : ''}
                         </div>
-                        <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
-                            <div style="font-size: 0.8rem; color: var(--accent-primary); margin-bottom: 4px;">NIGHT</div>
-                            ${night.length ? night.join(', ') : '-'}
+                        <div class="worker-list">
+                            ${morning.length ? makePills(morning) : '<span style="font-size:0.8rem; opacity:0.5">Empty</span>'}
+                        </div>
+                    </div>
+
+                    <div class="shift-row night">
+                        <div class="shift-label-row">
+                            <span class="shift-icon">🌙 Night</span>
+                            ${day.passenger_n ? `<span class="pass-tag">🚫 ${day.passenger_n}</span>` : ''}
+                        </div>
+                        <div class="worker-list">
+                            ${night.length ? makePills(night) : '<span style="font-size:0.8rem; opacity:0.5">Empty</span>'}
                         </div>
                     </div>
                 </div>
@@ -44,40 +73,61 @@ export async function renderRoster() {
         html += '</div></div>';
         container.innerHTML = html;
 
-        // Edit Handler (Simple Prompt for MVP, can be upgraded to Modal later)
-        if (isAdmin) {
-            document.querySelectorAll('.editable-day').forEach(el => {
-                el.addEventListener('click', async () => {
-                    const dayIndex = el.dataset.day;
-                    const dayName = days[dayIndex];
+        // Edit Handler
+        // For now, we keep it simple but support the new structure
+        // In a real app, this should be a proper Modal form
+        document.querySelectorAll('.editable-day').forEach(el => {
+            el.addEventListener('click', async () => {
+                const dayIndex = el.dataset.day;
+                const dayName = days[dayIndex];
 
-                    // Very basic editing for MVP - using prompt is ugly but functional for now
-                    // In a real app we'd use a modal with checkboxes
-                    const m1 = prompt(`Edit ${dayName} Morning (Person 1):`);
-                    const m2 = prompt(`Edit ${dayName} Morning (Person 2):`);
-                    const n1 = prompt(`Edit ${dayName} Night (Person 1):`);
-                    const n2 = prompt(`Edit ${dayName} Night (Person 2):`);
+                // Simple Prompt Flow
+                if (!confirm(`Edit Roster for ${dayName}?`)) return;
 
-                    if (m1 !== null) { // If not cancelled
-                        const morning = [m1, m2].filter(x => x);
-                        const night = [n1, n2].filter(x => x);
+                // Morning
+                const m1n = prompt("Morning Person 1 Name:");
+                const m1t = m1n ? prompt("Morning Person 1 Time (e.g. Till 11am):") : "";
 
-                        try {
-                            await apiCall('/roster/update', 'POST', {
-                                day_index: dayIndex,
-                                morning,
-                                night,
-                                passenger_m: '',
-                                passenger_n: ''
-                            }, token);
-                            renderRoster(); // Refresh
-                        } catch (e) {
-                            alert(e.message);
-                        }
-                    }
-                });
+                const m2n = prompt("Morning Person 2 Name:");
+                const m2t = m2n ? prompt("Morning Person 2 Time:") : "";
+
+                // Passenger M
+                const pm = prompt("Morning Passenger (Off-Duty):");
+
+                // Night
+                const n1n = prompt("Night Person 1 Name:");
+                const n1t = n1n ? prompt("Night Person 1 Time:") : "";
+
+                const n2n = prompt("Night Person 2 Name:");
+                const n2t = n2n ? prompt("Night Person 2 Time:") : "";
+
+                // Passenger N
+                const pn = prompt("Night Passenger (Off-Duty):");
+
+                // Construct Data
+                const morning = [];
+                if (m1n) morning.push({ n: m1n, t: m1t });
+                if (m2n) morning.push({ n: m2n, t: m2t });
+
+                const night = [];
+                if (n1n) night.push({ n: n1n, t: n1t });
+                if (n2n) night.push({ n: n2n, t: n2t });
+
+                try {
+                    await apiCall('/roster/update', 'POST', {
+                        day_index: dayIndex,
+                        morning,
+                        night,
+                        passenger_m: pm || '',
+                        passenger_n: pn || ''
+                    }, token);
+                    renderRoster(); // Refresh
+                    showToast('Roster Updated', 'success');
+                } catch (e) {
+                    showToast(e.message, 'error');
+                }
             });
-        }
+        });
 
     } catch (error) {
         container.innerHTML = `<div class="p-4" style="color: var(--danger)">Error: ${error.message}</div>`;

@@ -108,7 +108,11 @@ class GroupController {
         }
 
         // Get Members
-        $stmt = $this->pdo->prepare("SELECT id, name, role, avatar_initial FROM users WHERE group_id = ?");
+        $stmt = $this->pdo->prepare("
+            SELECT u.id, u.name, u.email, u.role 
+            FROM users u 
+            WHERE u.group_id = ?
+        ");
         $stmt->execute([$user['group_id']]);
         $members = $stmt->fetchAll();
 

@@ -1,4 +1,5 @@
 import { apiCall } from '../api.js';
+import { showToast } from './toast.js';
 
 export async function renderDashboard() {
     const container = document.getElementById('view-container');
@@ -6,108 +7,119 @@ export async function renderDashboard() {
 
     try {
         const token = localStorage.getItem('token');
-        const [rosterRes, taskRes] = await Promise.all([
+        // Parallel fetch: Roster (Today) + Tasks (Today)
+        const [rosterRes, tasksRes] = await Promise.all([
             apiCall('/roster/today', 'GET', null, token),
             apiCall('/tasks/today', 'GET', null, token)
         ]);
 
-        const today = rosterRes.today;
-        const tasks = taskRes.tasks;
+        const day = rosterRes.day;
+        const tasks = tasksRes.tasks;
 
-        // If no roster set yet
-        if (!today) {
-            container.innerHTML = `
-                <div class="fade-in p-4">
-                    <h1>Dashboard</h1>
-                    <div class="card mt-4">
-                        <p>Roster not set up yet.</p>
-                    </div>
-                </div>
-            `;
-            return;
+        // Parse Roster Data
+        let morning = [], night = [], activePassenger = null;
+
+        if (day) {
+            morning = JSON.parse(day.morning || '[]');
+            night = JSON.parse(day.night || '[]');
+            activePassenger = new Date().getHours() < 16 ? day.passenger_m : day.passenger_n;
         }
 
-        const morning = JSON.parse(today.morning || '[]');
-        const night = JSON.parse(today.night || '[]');
+        // Normalize
+        morning = morning.map(x => typeof x === 'string' ? { n: x, t: '' } : x);
+        night = night.map(x => typeof x === 'string' ? { n: x, t: '' } : x);
 
-        let taskHtml = '';
-        if (tasks) {
-            taskHtml = '<div class="task-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">';
-            for (const [task, person] of Object.entries(tasks)) {
-                taskHtml += `
-                    <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${task}</div>
-                        <div style="font-weight: 600;">${person}</div>
-                    </div>
-                `;
-            }
-            taskHtml += '</div>';
-        } else {
-            taskHtml = `
-                <p style="color: var(--text-secondary);">Lottery not run yet.</p>
-                <button id="run-lottery-btn" class="btn btn-primary mt-4">Run Lottery 🎲</button>
-            `;
-        }
+        // Determine Current Shift (Morning < 4PM)
+        const h = new Date().getHours();
+        const isMorn = h < 16;
+        const activeTeam = isMorn ? morning : night;
+        const badgeClass = isMorn ? 'badge-m' : 'badge-n';
+        const badgeText = isMorn ? '☀️ MORNING' : '🌙 NIGHT';
 
-        container.innerHTML = `
+        // Helper for names
+        const teamNames = activeTeam.length ? activeTeam.map(x => x.n).join(' + ') : 'No One';
+
+        let html = `
             <div class="fade-in" style="padding-bottom: 80px;">
-                <div class="flex-center" style="justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h1>Today</h1>
-                    <span style="color: var(--text-secondary); font-size: 0.9rem;">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</span>
-                </div>
-
-                <!-- Morning Shift -->
-                <div class="card mb-4" style="border-left: 4px solid var(--warning);">
-                    <div class="flex-center" style="justify-content: flex-start; gap: 10px; margin-bottom: 1rem;">
-                        <span style="font-size: 1.5rem;">☀️</span>
-                        <h3>Morning Shift</h3>
-                    </div>
-                    <div class="shift-members">
-                        ${morning.length ? morning.map(name => `<div class="chip">${name}</div>`).join('') : '<p>No one assigned</p>'}
-                    </div>
-                    ${today.passenger_m ? `<div class="mt-4 p-2" style="background: rgba(255,255,255,0.05); border-radius: 8px;"><small>Passenger: ${today.passenger_m}</small></div>` : ''}
-                </div>
-
-                <!-- Night Shift -->
-                <div class="card mb-4" style="border-left: 4px solid var(--accent-primary);">
-                    <div class="flex-center" style="justify-content: flex-start; gap: 10px; margin-bottom: 1rem;">
-                        <span style="font-size: 1.5rem;">🌙</span>
-                        <h3>Night Shift</h3>
-                    </div>
-                    <div class="shift-members">
-                        ${night.length ? night.map(name => `<div class="chip">${name}</div>`).join('') : '<p>No one assigned</p>'}
-                    </div>
-                    ${today.passenger_n ? `<div class="mt-4 p-2" style="background: rgba(255,255,255,0.05); border-radius: 8px;"><small>Passenger: ${today.passenger_n}</small></div>` : ''}
-                </div>
-
-                <!-- Tasks -->
+                <!-- Live Protocol -->
                 <div class="card">
-                    <div class="flex-center" style="justify-content: flex-start; gap: 10px; margin-bottom: 1rem;">
-                        <span style="font-size: 1.5rem;">🧹</span>
-                        <h3>Daily Tasks</h3>
+                    <h2>Live Protocol</h2>
+                    <span class="status-big" id="dash-status">${teamNames}</span>
+                    <div class="status-row">
+                        <span style="font-size:0.85rem; color:var(--text-secondary)">Active Team (Cook+Clean)</span>
+                        <span class="badge ${badgeClass}">${badgeText}</span>
                     </div>
-                    ${taskHtml}
+                </div>
+
+                <!-- Passenger -->
+                <div class="card">
+                    <h2>Passenger (Off-Duty)</h2>
+                    <span class="status-big" id="passenger-name">${activePassenger || '...'}</span>
+                    <div class="status-row">
+                        <span style="font-size:0.85rem; color:var(--text-secondary)">Relaxing / Sleeping / Class</span>
+                    </div>
+                </div>
+
+                <!-- Tasks / Lottery -->
+                <div class="card">
+                    <h2>Today's Micro-Tasks</h2>
+                    <div id="dash-task-container">
+                        ${renderTasksOrLottery(tasks)}
+                    </div>
                 </div>
             </div>
         `;
 
-        // Attach Handler
-        const lotteryBtn = document.getElementById('run-lottery-btn');
-        if (lotteryBtn) {
-            lotteryBtn.addEventListener('click', async () => {
+        container.innerHTML = html;
+
+        // Attach Event Listener for Lottery
+        const btn = document.getElementById('lottery-draw-btn');
+        if (btn) {
+            btn.addEventListener('click', async () => {
+                btn.disabled = true;
+                btn.innerText = '🎲 SPINNING...';
                 try {
-                    lotteryBtn.disabled = true;
-                    lotteryBtn.textContent = 'Spinning...';
-                    await apiCall('/tasks/assign', 'POST', { date: new Date().toISOString().split('T')[0] }, token);
-                    renderDashboard(); // Refresh
+                    const res = await apiCall('/tasks/assign', 'POST', null, token);
+                    // Refresh view
+                    renderDashboard();
+                    showToast('Tasks Assigned!', 'success');
                 } catch (e) {
-                    alert(e.message);
-                    lotteryBtn.disabled = false;
+                    showToast(e.message, 'error');
+                    btn.disabled = false;
+                    btn.innerText = '🎲 SPIN THE WHEEL';
                 }
             });
         }
 
     } catch (error) {
         container.innerHTML = `<div class="p-4" style="color: var(--danger)">Error: ${error.message}</div>`;
+    }
+}
+
+function renderTasksOrLottery(tasks) {
+    if (tasks && tasks.length > 0) {
+        // Render List
+        let html = '';
+        tasks.forEach(t => {
+            html += `
+                <div class="dash-task-row">
+                    <span style="color:var(--text-secondary)">${t.task_name}</span>
+                    <span style="font-weight:600">${t.assigned_to_name}</span>
+                </div>
+            `;
+        });
+        return html;
+    } else {
+        // Render Lottery Button
+        return `
+            <div style="text-align:center; padding:10px 0;">
+                <button id="lottery-draw-btn" class="btn-primary" style="width:100%; padding:15px; font-size:1.1rem; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border:none; box-shadow: 0 4px 15px rgba(0,122,255,0.3);">
+                    🎲 SPIN THE WHEEL
+                </button>
+                <p style="margin-top:15px; font-size:0.8rem; color:var(--text-secondary);">
+                    Tap to assign Brooming, Water, Trash & Market.
+                </p>
+            </div>
+        `;
     }
 }

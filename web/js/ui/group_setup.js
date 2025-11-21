@@ -1,5 +1,7 @@
 import { apiCall } from '../api.js';
 import { navigate } from '../app.js';
+import { updateState } from '../state.js';
+import { showToast } from './toast.js';
 
 export function renderGroupSetup() {
     const container = document.getElementById('view-container');
@@ -40,16 +42,18 @@ export function renderGroupSetup() {
             const token = localStorage.getItem('token');
             const res = await apiCall('/group/create', 'POST', { name }, token);
 
-            // Update local user state
+            // Update State
             const user = JSON.parse(localStorage.getItem('user'));
             user.group_id = res.group_id;
             user.role = 'admin';
-            localStorage.setItem('user', JSON.stringify(user));
 
-            alert(`Group Created! Your Group ID is ${res.group_id}. Share this with your roommates.`);
+            updateState('user', user);
+            updateState('group', { id: res.group_id, name: name });
+
+            showToast(`Group Created! ID: ${res.group_id}`, 'success');
             navigate('dashboard');
         } catch (error) {
-            alert(error.message);
+            showToast(error.message, 'error');
         }
     });
 
@@ -62,15 +66,17 @@ export function renderGroupSetup() {
             const token = localStorage.getItem('token');
             await apiCall('/group/join', 'POST', { group_id: groupId }, token);
 
-            // Update local user state
+            // Update State
             const user = JSON.parse(localStorage.getItem('user'));
             user.group_id = groupId;
-            localStorage.setItem('user', JSON.stringify(user));
 
-            alert('Joined group successfully!');
+            updateState('user', user);
+            updateState('group', { id: groupId, name: 'My Group' }); // We don't know name yet, but ID is enough for guard
+
+            showToast('Joined group successfully!', 'success');
             navigate('dashboard');
         } catch (error) {
-            alert(error.message);
+            showToast(error.message, 'error');
         }
     });
 }
