@@ -250,6 +250,31 @@ export async function renderChat() {
         if (!text) return;
 
         input.value = ''; // Optimistic clear
+
+        // Offline Handling
+        if (!navigator.onLine) {
+            try {
+                const { queueAction } = await import('../store.js');
+                await queueAction('/chat/send', 'POST', { message: text });
+
+                // Optimistic UI Update
+                const div = document.createElement('div');
+                div.className = 'msg-bubble me';
+                div.style.opacity = '0.7'; // Visual indicator for pending
+                div.innerHTML = `
+                    <div class="sender">You (Pending)</div>
+                    <div class="text">${text}</div>
+                    <div class="time"><i class="ph ph-clock"></i> Waiting for connection</div>
+                `;
+                msgContainer.appendChild(div);
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+
+            } catch (e) {
+                alert('Failed to queue message');
+            }
+            return;
+        }
+
         try {
             await apiCall('/chat/send', 'POST', { message: text }, localStorage.getItem('token'));
             loadMessages(msgContainer, user.id); // Immediate fetch
@@ -277,7 +302,7 @@ async function loadMessages(container, myId) {
             res.messages.forEach(msg => {
                 lastId = Math.max(lastId, msg.id);
                 const isMe = msg.sender_id == myId;
-                
+
                 // Assign color based on user ID (modulo 10 for color rotation)
                 const userColorClass = !isMe ? `user-${msg.sender_id % 10}` : '';
 

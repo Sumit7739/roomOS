@@ -1,6 +1,7 @@
 import { apiCall } from '../api.js';
 import { showToast } from './toast.js';
 import { getState } from '../state.js';
+import { queueAction } from '../store.js';
 
 export async function renderTransactions() {
     const container = document.getElementById('view-container');
@@ -58,7 +59,7 @@ export async function renderTransactions() {
             balances.forEach(balance => {
                 const amount = parseFloat(balance.balance);
                 if (amount === 0) return; // Skip zero balances
-                
+
                 // Find the user name by matching ID
                 let userName = 'Unknown User';
                 if (balance.other_user_id) {
@@ -69,12 +70,12 @@ export async function renderTransactions() {
                 } else if (balance.user_name) {
                     userName = balance.user_name;
                 }
-                
+
                 const isOwed = amount > 0;
                 const color = isOwed ? 'var(--success)' : 'var(--danger)';
                 const icon = isOwed ? '↑' : '↓';
                 const text = isOwed ? 'owes you' : 'you owe';
-                
+
                 html += `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--bg-tertiary);">
                         <div style="display: flex; align-items: center; gap: 12px;">
@@ -186,24 +187,66 @@ export async function renderTransactions() {
         saveBtn.addEventListener('click', async () => {
             const desc = document.getElementById('desc').value;
             const amount = document.getElementById('amount').value;
-            
+
             // Get selected user IDs
             const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked'))
                 .map(cb => parseInt(cb.value));
-            
+
             if (!desc || !amount) return showToast('Please fill all fields', 'error');
             if (selectedUsers.length === 0) return showToast('Please select at least one user', 'error');
+
+            const payload = {
+                description: desc,
+                amount,
+                split_between: selectedUsers
+            };
+
+            // Offline Handling
+            if (!navigator.onLine) {
+                // 1. Optimistic UI Update (Instant)
+                const list = document.querySelector('.transactions-list');
+                const tempHtml = `
+                    <div class="card mb-2" style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--warning);">
+                        <div>
+                            <div style="font-weight: 600;">${desc}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">Paid by You (Pending Sync)</div>
+                        </div>
+                        <div style="font-weight: 700; color: var(--text-primary);">₹${parseFloat(amount).toFixed(2)}</div>
+                    </div>
+                `;
+
+                if (list.innerHTML.includes('No transactions yet')) {
+                    list.innerHTML = tempHtml;
+                } else {
+                    list.innerHTML = tempHtml + list.innerHTML;
+                }
+
+                // Reset form immediately
+                form.classList.add('hidden');
+                addBtn.classList.remove('hidden');
+                document.getElementById('desc').value = '';
+                document.getElementById('amount').value = '';
+
+                showToast('Saved offline. Will sync when online.', 'warning');
+
+                // 2. Queue in background
+                queueAction('/transactions/add', 'POST', payload).catch(e => {
+                    console.error('Failed to queue offline action', e);
+                    // Fallback to localStorage
+                    const offline = JSON.parse(localStorage.getItem('offline_transactions') || '[]');
+                    offline.push(payload);
+                    localStorage.setItem('offline_transactions', JSON.stringify(offline));
+                });
+
+                return;
+            }
 
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
 
             try {
                 const token = localStorage.getItem('token');
-                await apiCall('/transactions/add', 'POST', { 
-                    description: desc, 
-                    amount,
-                    split_between: selectedUsers 
-                }, token);
+                await apiCall('/transactions/add', 'POST', payload, token);
                 showToast('Expense Added', 'success');
                 renderTransactions(); // Refresh
             } catch (e) {

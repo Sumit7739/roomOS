@@ -32,6 +32,25 @@
                 </button>
             </div>
         </header>
+
+        <div id="offline-banner" style="
+            display: none;
+            background: var(--danger);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            position: sticky;
+            top: 60px;
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        ">
+            <i class="ph ph-wifi-slash"></i> You are offline. Changes will sync automatically.
+        </div>
+
         <!-- Views will be injected here -->
         <div id="view-container" class="p-4"></div>
 

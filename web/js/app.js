@@ -49,6 +49,11 @@ export function navigate(view) {
         return;
     }
 
+    // Save current view
+    if (view !== 'login' && view !== 'group_setup') {
+        localStorage.setItem('last_view', view);
+    }
+
     // Hide/Show bottom nav based on view
     if (bottomNav) {
         if (view === 'chat') {
@@ -105,18 +110,6 @@ export function navigate(view) {
     }
 }
 
-// The updateActiveNav function is no longer needed as its logic is now inline within navigate.
-// However, to maintain the structure of the original file, we'll keep the function definition
-// but it will not be called from navigate anymore.
-function updateActiveNav(view) {
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.dataset.target === view) {
-            item.classList.add('active');
-        }
-    });
-}
-
 // Theme Logic
 function toggleTheme() {
     const body = document.body;
@@ -152,7 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial Route
     if (state.token) {
-        navigate('dashboard');
+        const lastView = localStorage.getItem('last_view');
+        if (lastView && lastView !== 'login' && lastView !== 'group_setup') {
+            navigate(lastView);
+        } else {
+            navigate('dashboard');
+        }
     } else {
         navigate('login');
     }
@@ -163,4 +161,20 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(() => console.log('SW Registered'))
             .catch(err => console.error('SW Fail', err));
     }
+
+    // Network Status Handler
+    function updateOnlineStatus() {
+        const banner = document.getElementById('offline-banner');
+        if (banner) {
+            if (navigator.onLine) {
+                banner.style.display = 'none';
+            } else {
+                banner.style.display = 'flex';
+            }
+        }
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus(); // Initial check
 });
