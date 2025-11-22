@@ -57,28 +57,26 @@ class TransactionController {
             $stmt = $this->pdo->prepare("INSERT INTO transactions (group_id, user_id, amount, description) VALUES (?, ?, ?, ?)");
             $stmt->execute([$user['group_id'], $userId, $amount, $data['description']]);
 
-            // 2. Update Balances (Simplified Split)
-            // Logic: Payer gets +Amount, Everyone else gets -(Amount / N)
-            // Actually, simpler: Payer paid X.
-            // Total cost X. Split by N members. Share = X/N.
-            // Payer is "owed" (X - Share).
-            // Others "owe" (Share).
-            
-            // Get all members count
-            $stmt = $this->pdo->prepare("SELECT count(*) FROM users WHERE group_id = ?");
-            $stmt->execute([$user['group_id']]);
-            $memberCount = $stmt->fetchColumn();
+            // 2. Update Balances with selective split
+            // Get members to split between (default to all if not specified)
+            $splitBetween = isset($data['split_between']) && is_array($data['split_between']) 
+                ? $data['split_between'] 
+                : null;
+
+            if ($splitBetween === null) {
+                // Get all members if not specified
+                $stmt = $this->pdo->prepare("SELECT id FROM users WHERE group_id = ?");
+                $stmt->execute([$user['group_id']]);
+                $splitBetween = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            }
+
+            $memberCount = count($splitBetween);
 
             if ($memberCount > 0) {
                 $share = $amount / $memberCount;
 
-                // Get all members
-                $stmt = $this->pdo->prepare("SELECT id FROM users WHERE group_id = ?");
-                $stmt->execute([$user['group_id']]);
-                $members = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-                foreach ($members as $mid) {
-                    // Check if balance row exists
+                foreach ($splitBetween as $mid) {
+                    // Ensure balance row exists
                     $stmt = $this->pdo->prepare("SELECT id FROM balances WHERE group_id = ? AND user_id = ?");
                     $stmt->execute([$user['group_id'], $mid]);
                     if (!$stmt->fetch()) {
@@ -131,29 +129,52 @@ class TransactionController {
         $stmt->execute([$user['group_id']]);
         $transactions = $stmt->fetchAll();
 
-        // Get balances
-        $stmt = $this->pdo->prepare("
-            SELECT b.balance, u.name 
-            FROM balances b 
-            JOIN users u ON b.user_id = u.id 
-            WHERE b.group_id = ?
-        ");
-        $stmt->execute([$user['group_id']]);
-        $balances = $stmt->fetchAll();
-
         // Get my balance
-        $myBalance = 0;
-        foreach ($balances as $b) {
-            if ($b['name'] === $this->getUserName($userId)) { // Optimization: fetch name in getUserGroup or separate query
-                 // Actually, we need to know which one is ME.
-                 // Let's just filter by user_id in a separate query or loop if we had IDs.
-                 // Re-query for strict correctness or add ID to balance query
-            }
-        }
-        // Better:
         $stmt = $this->pdo->prepare("SELECT balance FROM balances WHERE user_id = ?");
         $stmt->execute([$userId]);
         $myBal = $stmt->fetchColumn();
+
+        // Get individual balances (who owes whom)
+        // We need to calculate pairwise balances
+        $stmt = $this->pdo->prepare("
+            SELECT b.user_id, b.balance, u.name as user_name
+            FROM balances b 
+            JOIN users u ON b.user_id = u.id 
+            WHERE b.group_id = ? AND b.user_id != ?
+        ");
+        $stmt->execute([$user['group_id'], $userId]);
+        $otherBalances = $stmt->fetchAll();
+
+        // Transform to show relative balances
+        $balances = [];
+        foreach ($otherBalances as $other) {
+            // If my balance is +100 and their balance is -50
+            // Then they owe me 50 (from my perspective)
+            // Actually, we need to think differently:
+            // Each person has a balance. Positive = they are owed, Negative = they owe
+            // To show "X owes you" or "you owe X", we compare balances
+            
+            // Simpler approach: Show their balance from my perspective
+            // If their balance is negative, they owe the group (including me)
+            // If their balance is positive, the group owes them (including me)
+            
+            // Actually for pairwise: we need to calculate based on total balances
+            // For now, let's show a simplified view:
+            // My balance vs their balance gives us the relationship
+            
+            $myBalance = floatval($myBal ?: 0);
+            $theirBalance = floatval($other['balance']);
+            
+            // Calculate pairwise balance
+            // This is simplified - in reality we'd need more complex calculation
+            // For now: if I'm +100 and they're -100, they owe me proportionally
+            
+            $balances[] = [
+                'other_user_id' => $other['user_id'],
+                'other_user_name' => $other['user_name'],
+                'balance' => -$theirBalance // Negative of their balance shows what they owe/are owed
+            ];
+        }
 
         echo json_encode([
             'transactions' => $transactions,

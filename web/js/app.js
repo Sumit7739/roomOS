@@ -22,7 +22,7 @@ window.app = {
 export function navigate(view) {
     const container = document.getElementById('view-container');
     const state = getState();
-    const nav = document.getElementById('bottom-nav');
+    const bottomNav = document.querySelector('.bottom-nav');
 
     // Clear current view
     container.innerHTML = '';
@@ -49,6 +49,15 @@ export function navigate(view) {
         return;
     }
 
+    // Hide/Show bottom nav based on view
+    if (bottomNav) {
+        if (view === 'chat') {
+            bottomNav.style.display = 'none';
+        } else {
+            bottomNav.style.display = 'flex';
+        }
+    }
+
     // Update Nav Active State
     document.querySelectorAll('.nav-item').forEach(el => {
         el.classList.toggle('active', el.dataset.target === view);
@@ -62,6 +71,7 @@ export function navigate(view) {
     // Clear current view
     container.innerHTML = '';
 
+    // Render the page content immediately
     switch (view) {
         case 'login':
             renderLogin();

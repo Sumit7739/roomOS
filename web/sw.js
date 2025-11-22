@@ -1,4 +1,4 @@
-const CACHE_NAME = 'roomos-v3';
+const CACHE_NAME = 'roomos-v4';
 const ASSETS = [
     './',
     './index.html',
@@ -18,7 +18,8 @@ const ASSETS = [
     './js/ui/transactions.js',
     './js/ui/chat.js',
     './js/ui/toast.js',
-    './manifest.json'
+    './manifest.json',
+    './icon.svg'
 ];
 
 // Install: Cache Static Assets
