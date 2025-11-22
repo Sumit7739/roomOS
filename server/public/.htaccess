@@ -1,4 +1,11 @@
 <IfModule mod_rewrite.c>
+    # CORS Headers (Fallback for 404/500 errors)
+    <IfModule mod_headers.c>
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET,POST,PUT,DELETE,OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+    </IfModule>
+
     RewriteEngine On
     
     # Handle Cross Origin Resource Sharing

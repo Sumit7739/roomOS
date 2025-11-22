@@ -132,6 +132,9 @@ $routes = [
 
     // App Updates
     '/app/updates' => ['UpdateController', 'check'],
+
+    // Debug
+    '/debug/info' => ['TestController', 'debugInfo'],
 ];
 
 if (array_key_exists($uri, $routes)) {
