@@ -99,6 +99,10 @@ $routes = [
     '/group/create' => ['GroupController', 'create'],
     '/group/join' => ['GroupController', 'join'],
     '/group/members' => ['GroupController', 'members'],
+    '/group/pending-requests' => ['GroupController', 'pendingRequests'],
+    '/group/approve-request' => ['GroupController', 'approveRequest'],
+    '/group/reject-request' => ['GroupController', 'rejectRequest'],
+    '/group/my-request-status' => ['GroupController', 'myRequestStatus'],
 
     // Roster
     '/roster/week' => ['RosterController', 'getWeek'],
@@ -116,6 +120,11 @@ $routes = [
     // Chat
     '/chat/send' => ['ChatController', 'send'],
     '/chat/since' => ['ChatController', 'since'],
+    
+    // Schedule
+    '/schedule/save' => ['ScheduleController', 'save'],
+    '/schedule/get' => ['ScheduleController', 'get'],
+    '/schedule/generate-plan' => ['ScheduleController', 'generatePlan'],
     
     // Test
     '/test' => ['TestController', 'index'],

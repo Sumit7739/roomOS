@@ -17,7 +17,7 @@ export async function renderRoster() {
         let html = `
             <div class="fade-in" style="padding-bottom: 80px;">
                 <div style="text-align:center; margin-bottom:15px; color:var(--text-secondary); font-size:0.8rem;">
-                    Tap a day to edit plan
+                    Weekly Plan (Auto-Generated)
                 </div>
                 <div id="roster-list">
         `;
@@ -41,7 +41,7 @@ export async function renderRoster() {
             ).join('');
 
             html += `
-                <div class="roster-card ${isToday} editable-day" data-day="${day.day_index}">
+                <div class="roster-card ${isToday}" data-day="${day.day_index}">
                     <div class="roster-header">
                         <span>${dayName}</span>
                         ${todayBadge}
@@ -72,62 +72,6 @@ export async function renderRoster() {
 
         html += '</div></div>';
         container.innerHTML = html;
-
-        // Edit Handler
-        // For now, we keep it simple but support the new structure
-        // In a real app, this should be a proper Modal form
-        document.querySelectorAll('.editable-day').forEach(el => {
-            el.addEventListener('click', async () => {
-                const dayIndex = el.dataset.day;
-                const dayName = days[dayIndex];
-
-                // Simple Prompt Flow
-                if (!confirm(`Edit Roster for ${dayName}?`)) return;
-
-                // Morning
-                const m1n = prompt("Morning Person 1 Name:");
-                const m1t = m1n ? prompt("Morning Person 1 Time (e.g. Till 11am):") : "";
-
-                const m2n = prompt("Morning Person 2 Name:");
-                const m2t = m2n ? prompt("Morning Person 2 Time:") : "";
-
-                // Passenger M
-                const pm = prompt("Morning Passenger (Off-Duty):");
-
-                // Night
-                const n1n = prompt("Night Person 1 Name:");
-                const n1t = n1n ? prompt("Night Person 1 Time:") : "";
-
-                const n2n = prompt("Night Person 2 Name:");
-                const n2t = n2n ? prompt("Night Person 2 Time:") : "";
-
-                // Passenger N
-                const pn = prompt("Night Passenger (Off-Duty):");
-
-                // Construct Data
-                const morning = [];
-                if (m1n) morning.push({ n: m1n, t: m1t });
-                if (m2n) morning.push({ n: m2n, t: m2t });
-
-                const night = [];
-                if (n1n) night.push({ n: n1n, t: n1t });
-                if (n2n) night.push({ n: n2n, t: n2t });
-
-                try {
-                    await apiCall('/roster/update', 'POST', {
-                        day_index: dayIndex,
-                        morning,
-                        night,
-                        passenger_m: pm || '',
-                        passenger_n: pn || ''
-                    }, token);
-                    renderRoster(); // Refresh
-                    showToast('Roster Updated', 'success');
-                } catch (e) {
-                    showToast(e.message, 'error');
-                }
-            });
-        });
 
     } catch (error) {
         container.innerHTML = `<div class="p-4" style="color: var(--danger)">Error: ${error.message}</div>`;

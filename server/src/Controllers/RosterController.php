@@ -72,7 +72,7 @@ class RosterController {
         $stmt->execute([$user['group_id'], $dayIndex]);
         $today = $stmt->fetch();
 
-        echo json_encode(['today' => $today]);
+        echo json_encode(['day' => $today]);
     }
 
     public function update() {

@@ -17,15 +17,16 @@ export async function renderDashboard() {
         const tasks = tasksRes.tasks;
 
         // Parse Roster Data
-        let morning = [], night = [], activePassenger = null;
+        let morning = [], night = [], passengerM = '', passengerN = '';
 
         if (day) {
             morning = JSON.parse(day.morning || '[]');
             night = JSON.parse(day.night || '[]');
-            activePassenger = new Date().getHours() < 16 ? day.passenger_m : day.passenger_n;
+            passengerM = day.passenger_m || '';
+            passengerN = day.passenger_n || '';
         }
 
-        // Normalize
+        // Normalize to {n: name, t: time} format
         morning = morning.map(x => typeof x === 'string' ? { n: x, t: '' } : x);
         night = night.map(x => typeof x === 'string' ? { n: x, t: '' } : x);
 
@@ -33,11 +34,12 @@ export async function renderDashboard() {
         const h = new Date().getHours();
         const isMorn = h < 16;
         const activeTeam = isMorn ? morning : night;
+        const activePassenger = isMorn ? passengerM : passengerN;
         const badgeClass = isMorn ? 'badge-m' : 'badge-n';
         const badgeText = isMorn ? '☀️ MORNING' : '🌙 NIGHT';
 
         // Helper for names
-        const teamNames = activeTeam.length ? activeTeam.map(x => x.n).join(' + ') : 'No One';
+        const teamNames = activeTeam.length ? activeTeam.map(x => x.n).join(' + ') : 'No One Assigned';
 
         let html = `
             <div class="fade-in" style="padding-bottom: 80px;">
@@ -54,7 +56,7 @@ export async function renderDashboard() {
                 <!-- Passenger -->
                 <div class="card">
                     <h2>Passenger (Off-Duty)</h2>
-                    <span class="status-big" id="passenger-name">${activePassenger || '...'}</span>
+                    <span class="status-big" id="passenger-name">${activePassenger || 'Not Set'}</span>
                     <div class="status-row">
                         <span style="font-size:0.85rem; color:var(--text-secondary)">Relaxing / Sleeping / Class</span>
                     </div>
