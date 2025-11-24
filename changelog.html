@@ -183,13 +183,85 @@
     <!-- Changelog Content -->
     <div class="changelog-container">
         <div class="timeline">
-            <!-- Latest Release -->
+            <!-- Latest Release v2.6.0 -->
             <div class="release-card">
                 <div class="timeline-dot"></div>
                 <div class="release-header">
                     <div class="release-version">
-                        v2.4.0
+                        v2.6.0
                         <span class="release-tag">Latest</span>
+                    </div>
+                    <span class="release-date">November 25, 2025</span>
+                </div>
+                <div class="release-content">
+                    <h2 style="font-size: 1.3rem; margin-bottom: var(--spacing-sm); color: var(--text-primary);">The
+                        Critical Patch Update</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                        This release addresses critical bugs that were causing app crashes and improves the overall user
+                        experience with better UI spacing and external link handling.
+                    </p>
+
+                    <h3>🐛 Critical Bug Fixes</h3>
+                    <ul class="release-list">
+                        <li><strong>Fixed: App Crashes on Profile, Transactions, and Analytics Pages</strong> - Updated
+                            all modules to properly await async state hydration from Tauri's persistent storage.</li>
+                        <li><strong>Fixed: Update Download Button Opens Inside App</strong> - Implemented Tauri's opener
+                            plugin to properly open URLs in the system's default browser.</li>
+                        <li><strong>Fixed: Notification Panel Overlap on Android</strong> - Added CSS safe area insets
+                            to ensure header buttons remain accessible on devices with notches.</li>
+                        <li><strong>Fixed: Update Popup Scrolling Issue</strong> - Enabled scrolling for long release
+                            notes with max-height and overflow controls.</li>
+                    </ul>
+
+                    <h3>🎨 UI/UX Improvements</h3>
+                    <ul class="release-list">
+                        <li><strong>Custom App Icon:</strong> The app now displays your custom icon across all Android
+                            launchers.</li>
+                        <li><strong>Better Spacing:</strong> Improved overall spacing and padding throughout the app.
+                        </li>
+                    </ul>
+
+                    <h3>📱 Android</h3>
+                    <ul class="release-list">
+                        <li><strong>Package ID:</strong> <code>com.homesyncos.roomos</code></li>
+                        <li><strong>Version Code:</strong> Properly incremented to ensure smooth updates from v2.4.0
+                        </li>
+                        <li><strong>Signed Release:</strong> <code>roomos-v2.6.0-release.apk</code> (35MB)</li>
+                        <li><strong>Update Behavior:</strong> This version will update your existing RoomOS installation
+                        </li>
+                    </ul>
+
+                    <h3>🔧 Technical Details</h3>
+                    <ul class="release-list">
+                        <li>State Management: All UI modules now properly handle async state hydration</li>
+                        <li>External Links: Implemented platform-aware URL opening with Tauri opener plugin</li>
+                        <li>Safe Areas: Full support for device notches and status bars on modern Android devices</li>
+                    </ul>
+
+                    <div
+                        style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary);">
+                                <span style="font-weight: 600; color: var(--text-tertiary);">👨‍💻 Developer:</span>
+                                <span style="color: var(--text-primary); font-weight: 600;">Sumit Srivastava</span>
+                            </div>
+                            <div
+                                style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); margin-top: 4px;">
+                                <span style="font-weight: 600; color: var(--text-tertiary);">🏢 Company:</span>
+                                <span
+                                    style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">HomeSyncOS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v2.4.0 Release -->
+            <div class="release-card">
+                <div class="timeline-dot" style="background: var(--text-tertiary);"></div>
+                <div class="release-header">
+                    <div class="release-version">
+                        v2.4.0
                     </div>
                     <span class="release-date">November 24, 2025</span>
                 </div>
