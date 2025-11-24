@@ -19,84 +19,7 @@
     <!-- 3D Background Canvas -->
     <canvas id="bg-canvas"></canvas>
 
-    <!-- Download Modal -->
-    <div class="modal" id="downloadModal">
-        <div class="modal-overlay" onclick="closeDownloadModal()"></div>
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeDownloadModal()">&times;</button>
-            <div class="modal-header">
-                <div class="modal-icon">
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C2.92 11.03 1 14.22 1 17.8h22c0-3.58-1.92-6.77-5.4-8.32zM8.06 15.2c-.66 0-1.2-.54-1.2-1.2s.54-1.2 1.2-1.2 1.2.54 1.2 1.2-.54 1.2-1.2 1.2zm7.88 0c-.66 0-1.2-.54-1.2-1.2s.54-1.2 1.2-1.2 1.2.54 1.2 1.2-.54 1.2-1.2 1.2z"
-                            fill="url(#android-gradient)" />
-                        <defs>
-                            <linearGradient id="android-gradient" x1="0" y1="0" x2="24" y2="24">
-                                <stop offset="0%" stop-color="#3ddc84" />
-                                <stop offset="100%" stop-color="#2bb673" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-                <h2 class="modal-title">Download RoomOS for Android</h2>
-                <p class="modal-subtitle">Get started with the mobile app</p>
-            </div>
-            <div class="modal-body">
-                <div class="requirement-card">
-                    <h3>Minimum Requirements</h3>
-                    <ul class="requirement-list">
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="#3ddc84" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span><strong>Android 8.0</strong> or higher</span>
-                        </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="#3ddc84" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span><strong>50 MB</strong> free storage space</span>
-                        </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="#3ddc84" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span><strong>Internet connection</strong> for sync</span>
-                        </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="#3ddc84" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span><strong>2 GB RAM</strong> recommended</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="download-info">
-                    <p class="info-text">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <circle cx="10" cy="10" r="8" stroke="#667eea" stroke-width="2" />
-                            <path d="M10 6V10M10 14H10.01" stroke="#667eea" stroke-width="2" stroke-linecap="round" />
-                        </svg>
-                        Version 2.3.6 • 30 MB • Last updated: 23 Nov 2025
-                    </p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-modal-download" onclick="window.location.href='https://github.com/Sumit7739/RoomOS_V2/releases/download/v2.3.6/RoomOs-v2.3.6.apk'">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M10 3V13M10 13L6 9M10 13L14 9M3 17H17" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    Download APK
-                </button>
-                <p class="modal-note">Coming soon to Google Play Store</p>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -119,7 +42,7 @@
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#demo" class="nav-link">Demo</a>
                 <a href="#pricing" class="nav-link">Pricing</a>
-                <a href="#download" class="nav-link">Download</a>
+                <a href="download.html" class="nav-link">Download</a>
                 <a href="web/index.html" class="btn-primary">Launch App</a>
             </div>
             <button class="mobile-menu-btn" id="mobile-menu-btn">
@@ -135,7 +58,7 @@
         <a href="#features" class="mobile-nav-link">Features</a>
         <a href="#demo" class="mobile-nav-link">Demo</a>
         <a href="#pricing" class="mobile-nav-link">Pricing</a>
-        <a href="#download" class="mobile-nav-link">Download</a>
+        <a href="download.html" class="mobile-nav-link">Download</a>
         <a href="web/index.html" class="btn-primary">Launch App</a>
     </div>
 
@@ -159,13 +82,13 @@
                                 stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </a>
-                    <button onclick="openDownloadModal()" class="btn-hero-android">
+                    <a href="download.html" class="btn-hero-android">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path
                                 d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C2.92 11.03 1 14.22 1 17.8h22c0-3.58-1.92-6.77-5.4-8.32zM8.06 15.2c-.66 0-1.2-.54-1.2-1.2s.54-1.2 1.2-1.2 1.2.54 1.2 1.2-.54 1.2-1.2 1.2zm7.88 0c-.66 0-1.2-.54-1.2-1.2s.54-1.2 1.2-1.2 1.2.54 1.2 1.2-.54 1.2-1.2 1.2z" />
                         </svg>
                         Download for Android
-                    </button>
+                    </a>
                     <a href="#demo" class="btn-hero-secondary">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M6.66667 5L13.3333 10L6.66667 15V5Z" fill="currentColor" />
@@ -348,12 +271,11 @@
         <div class="demo-container">
             <div class="demo-showcase">
                 <div class="phone-mockup">
-                        <div class="phone-screen">
-                            <img src="dashboard.png" alt="Dashboard Screenshot" class="screenshot active"
-                                id="screenshot-1">
-                            <img src="chat.png" alt="Chat Screenshot" class="screenshot" id="screenshot-2">
-                            <img src="expenses.png" alt="Expenses Screenshot" class="screenshot" id="screenshot-3">
-                        </div>
+                    <div class="phone-screen">
+                        <img src="dashboard.png" alt="Dashboard Screenshot" class="screenshot active" id="screenshot-1">
+                        <img src="chat.png" alt="Chat Screenshot" class="screenshot" id="screenshot-2">
+                        <img src="expenses.png" alt="Expenses Screenshot" class="screenshot" id="screenshot-3">
+                    </div>
                 </div>
                 <div class="demo-controls">
                     <button class="demo-btn active" data-screenshot="1">
@@ -427,16 +349,16 @@
                 <h2 class="section-title">Get RoomOS on Android</h2>
                 <p class="section-description">Download our mobile app and manage your shared living on the go</p>
                 <div class="download-buttons">
-                    <button onclick="openDownloadModal()" class="btn-download">
+                    <a href="download.html" class="btn-download">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
                             <path
                                 d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C2.92 11.03 1 14.22 1 17.8h22c0-3.58-1.92-6.77-5.4-8.32zM8.06 15.2c-.66 0-1.2-.54-1.2-1.2s.54-1.2 1.2-1.2 1.2.54 1.2 1.2-.54 1.2-1.2 1.2zm7.88 0c-.66 0-1.2-.54-1.2-1.2s.54-1.2 1.2-1.2 1.2.54 1.2 1.2-.54 1.2-1.2 1.2z" />
                         </svg>
                         <div class="download-text">
-                            <span class="download-label">GET IT ON</span>
-                            <span class="download-store">Google Play</span>
+                            <span class="download-label">DOWNLOAD</span>
+                            <span class="download-store">Android App</span>
                         </div>
-                    </button>
+                    </a>
                 </div>
                 <p class="download-note">Coming soon to iOS App Store</p>
             </div>
@@ -529,6 +451,27 @@
         </div>
     </section>
 
+    <!-- Release Info Bar -->
+    <section class="release-bar"
+        style="border-top: 1px solid rgba(255,255,255,0.05); background: var(--bg-darker); padding: var(--spacing-lg) 0;">
+        <div class="nav-container"
+            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-md);">
+            <div class="release-info" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <span
+                    style="background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-family: var(--font-display);">v2.4.0</span>
+                <span style="color: var(--text-secondary);">Latest update includes Offline Support & Android App</span>
+            </div>
+            <a href="changelog.html"
+                style="color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; transition: opacity 0.2s; font-size: 0.95rem;">
+                View Changelog
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
@@ -565,6 +508,7 @@
                 <ul>
                     <li><a href="docs/API_REFERENCE.md">API Docs</a></li>
                     <li><a href="docs/DEVELOPER_GUIDE.md">Developer Guide</a></li>
+                    <li><a href="changelog.html">Changelog</a></li>
                     <li><a href="README.md">Documentation</a></li>
                     <li><a href="#">Support</a></li>
                 </ul>

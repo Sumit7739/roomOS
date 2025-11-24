@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog - RoomOS</title>
+    <meta name="description" content="Latest updates, improvements, and fixes for RoomOS.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        /* Changelog Specific Styles */
+        .changelog-hero {
+            padding: calc(80px + var(--spacing-2xl)) var(--spacing-lg) var(--spacing-xl);
+            text-align: center;
+            background: radial-gradient(circle at top, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        }
+
+        .changelog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg) var(--spacing-3xl);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: var(--spacing-xl);
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, rgba(102, 126, 234, 0.5), rgba(102, 126, 234, 0.1));
+            border-radius: var(--radius-full);
+        }
+
+        .release-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 15px;
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            transition: all var(--transition-base);
+        }
+
+        .release-card:hover {
+            transform: translateY(-4px);
+            background: var(--bg-card-hover);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: calc(-1 * var(--spacing-xl) - 5px);
+            top: var(--spacing-xl);
+            width: 12px;
+            height: 12px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--bg-dark);
+        }
+
+        .release-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .release-version {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .release-tag {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .release-date {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .release-content h3 {
+            font-size: 1.1rem;
+            margin: var(--spacing-md) 0 var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .release-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .release-list li {
+            position: relative;
+            padding-left: var(--spacing-md);
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .release-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .badge-new {
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1px solid #43e97b;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="10" fill="url(#logo-gradient)" />
+                    <path d="M12 16L20 12L28 16V24L20 28L12 24V16Z" stroke="white" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0" y1="0" x2="40" y2="40">
+                            <stop offset="0%" stop-color="#667eea" />
+                            <stop offset="100%" stop-color="#764ba2" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text">RoomOS</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html#features" class="nav-link">Features</a>
+                <a href="index.html#demo" class="nav-link">Demo</a>
+                <a href="index.html#pricing" class="nav-link">Pricing</a>
+                <a href="index.html#download" class="nav-link">Download</a>
+                <a href="web/index.html" class="btn-primary">Launch App</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="changelog-hero">
+        <span class="section-label">Updates</span>
+        <h1 class="section-title">Changelog</h1>
+        <p class="section-description">Stay up to date with the latest improvements and fixes.</p>
+    </section>
+
+    <!-- Changelog Content -->
+    <div class="changelog-container">
+        <div class="timeline">
+            <!-- Latest Release -->
+            <div class="release-card">
+                <div class="timeline-dot"></div>
+                <div class="release-header">
+                    <div class="release-version">
+                        v2.4.0
+                        <span class="release-tag">Latest</span>
+                    </div>
+                    <span class="release-date">November 24, 2025</span>
+                </div>
+                <div class="release-content">
+                    <h2 style="font-size: 1.3rem; margin-bottom: var(--spacing-sm); color: var(--text-primary);">The
+                        HomeSyncOS Update</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                        We've polished the experience, solidified the backend, and officially rebranded! RoomOS is now
+                        faster, more reliable, and ready for your home.
+                    </p>
+
+                    <h3>🚀 Major Changes</h3>
+                    <ul class="release-list">
+                        <li><strong>Official Rebranding:</strong> Now published under <strong>HomeSyncOS</strong>.</li>
+                        <li><strong>Enhanced Persistence:</strong> Login sessions now persist reliably across app
+                            restarts on Android. Implemented a robust native storage layer that syncs with your device's
+                            file system.</li>
+                        <li><strong>Native Integrations:</strong> Improved integration with Android system
+                            notifications. Better handling of offline states and data hydration.</li>
+                    </ul>
+
+                    <h3>🎨 UI & UX Improvements</h3>
+                    <ul class="release-list">
+                        <li><strong>Visual Refresh:</strong> A cleaner, more consistent look across the entire
+                            application.</li>
+                        <li><strong>Smoother Navigation:</strong> Optimized routing logic for a snappier feel when
+                            switching between Dashboard, Chat, and other views.</li>
+                        <li><strong>Smart State Management:</strong> The app now intelligently restores your previous
+                            session state, so you can pick up exactly where you left off.</li>
+                    </ul>
+
+                    <h3>🐛 Bug Fixes</h3>
+                    <ul class="release-list">
+                        <li>Fixed issues where login tokens might be lost on app close.</li>
+                        <li>Resolved race conditions during app initialization.</li>
+                        <li>Improved error handling for network requests.</li>
+                    </ul>
+
+                    <h3>� Android</h3>
+                    <ul class="release-list">
+                        <li><strong>Package ID:</strong> Updated to <code>com.homesyncos.roomos</code>.</li>
+                        <li><strong>Signed Release:</strong> <code>roomos-v2.4.0-release.apk</code> is ready for
+                            installation.</li>
+                    </ul>
+
+                    <div
+                        style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary);">
+                                <span style="font-weight: 600; color: var(--text-tertiary);">👨‍💻 Developers:</span>
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-left: 24px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="color: var(--text-tertiary); font-size: 0.8rem;">Backend & App:</span>
+                                    <span style="color: var(--text-primary); font-weight: 600;">Sumit Srivastava</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="color: var(--text-tertiary); font-size: 0.8rem;">Frontend:</span>
+                                    <span style="color: var(--text-primary); font-weight: 600;">Aditya Singh</span>
+                                </div>
+                            </div>
+                            <div
+                                style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); margin-top: 4px;">
+                                <span style="font-weight: 600; color: var(--text-tertiary);">🏢 Company:</span>
+                                <span
+                                    style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">HomeSyncOS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v2.3.6 Release -->
+            <div class="release-card">
+                <div class="timeline-dot" style="background: var(--text-tertiary);"></div>
+                <div class="release-header">
+                    <div class="release-version">
+                        v2.3.6
+                    </div>
+                    <span class="release-date">November 22, 2025</span>
+                </div>
+                <div class="release-content">
+                    <h2 style="font-size: 1.3rem; margin-bottom: var(--spacing-sm); color: var(--text-primary);">The "I
+                        Can't Believe It Works Offline" Update</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                        This release brings major stability improvements, a complete UI refresh, and the highly
+                        requested offline mode. Now you can settle debts and check the roster even when the Wi-Fi is
+                        down!
+                    </p>
+
+                    <h3>🌟 New Features</h3>
+                    <ul class="release-list">
+                        <li><strong>Robust Offline Support:</strong> RoomOS now works seamlessly without an internet
+                            connection. A new Offline Indicator banner appears when you lose connectivity. Changes made
+                            while offline are queued and automatically synced.</li>
+                        <li><strong>In-App Update Notifications:</strong> Never miss a version again! The app now
+                            automatically checks for updates and alerts you with a beautiful popup including release
+                            notes and download link.</li>
+                    </ul>
+
+                    <h3>🎨 Complete UI Overhaul</h3>
+                    <ul class="release-list">
+                        <li>The frontend has been significantly polished for a smoother, more premium experience.</li>
+                        <li>Improved navigation and responsive design adjustments.</li>
+                    </ul>
+
+                    <h3>🐛 Bug Fixes & Improvements</h3>
+                    <ul class="release-list">
+                        <li><strong>Android Build:</strong> Fixed keystore path issues ensuring smooth release builds
+                            for Android.</li>
+                        <li><strong>Performance:</strong> Optimized initial load times and state management.</li>
+                        <li><strong>Navigation:</strong> Smarter routing logic to handle authentication states and view
+                            history.</li>
+                    </ul>
+
+                    <h3>📱 Android</h3>
+                    <ul class="release-list">
+                        <li>Signed release APK is now available as <code>roomos-release.apk</code>.</li>
+                        <li>Includes all the latest offline syncing capabilities optimized for mobile data usage.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- v2.1.3 Release -->
+            <div class="release-card">
+                <div class="timeline-dot" style="background: var(--text-tertiary);"></div>
+                <div class="release-header">
+                    <div class="release-version">
+                        v2.1.3
+                    </div>
+                    <span class="release-date">November 20, 2025</span>
+                </div>
+                <div class="release-content">
+                    <h2 style="font-size: 1.3rem; margin-bottom: var(--spacing-sm); color: var(--text-primary);">The
+                        "Peacekeeper" Update 🏠✨</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                        Say goodbye to passive-aggressive sticky notes. We are thrilled to announce the first official
+                        release of RoomOS! This isn't just an app; it's a treaty for your shared living space. We've
+                        built the ultimate tool to manage bills, chores, and communication without the awkwardness.
+                    </p>
+
+                    <h3>🔥 Highlights</h3>
+                    <ul class="release-list">
+                        <li><strong>Expense Tracking that Works:</strong> Split bills instantly. We do the math so you
+                            don't have to. Finally, you'll know exactly who owes who for last Friday's pizza.</li>
+                        <li><strong>Offline-First Architecture:</strong> Internet down? No excuses. RoomOS works
+                            perfectly offline and syncs everything once you're back online.</li>
+                        <li><strong>Dedicated House Chat:</strong> Keep the "house business" separate from your memes. A
+                            focused channel for "Is the dishwasher clean?" and "Rent is due."</li>
+                        <li><strong>Visual Analytics:</strong> Beautiful charts to show you where your money is going.
+                        </li>
+                        <li><strong>Cross-Platform Freedom:</strong> Use it on your desktop or take it with you on
+                            Android.</li>
+                    </ul>
+
+                    <h3>📦 What's Included</h3>
+                    <ul class="release-list">
+                        <li><strong>RoomOS Desktop:</strong> The full command center for your home.</li>
+                        <li><strong>RoomOS Android:</strong> The mobile companion for managing your house on the go.
+                        </li>
+                    </ul>
+
+                    <h3>🛠 Installation</h3>
+                    <ul class="release-list">
+                        <li><strong>Android:</strong> Download the .apk file and install it on your device.</li>
+                        <li><strong>Desktop:</strong> Download the installer for your OS and run it to get started.</li>
+                    </ul>
+
+                    <div
+                        style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.95rem; color: var(--text-secondary); text-align: center;">
+                        <strong>Stop arguing, start living. Download RoomOS today! 🚀</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="10" fill="url(#footer-logo-gradient)" />
+                        <path d="M12 16L20 12L28 16V24L20 28L12 24V16Z" stroke="white" stroke-width="2" />
+                        <defs>
+                            <linearGradient id="footer-logo-gradient" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#667eea" />
+                                <stop offset="100%" stop-color="#764ba2" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>RoomOS</span>
+                </div>
+                <p class="footer-description">
+                    Streamline your shared living experience with the most comprehensive
+                    roommate management platform.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#demo">Demo</a></li>
+                    <li><a href="index.html#pricing">Pricing</a></li>
+                    <li><a href="web/index.html">Launch App</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="docs/API_REFERENCE.md">API Docs</a></li>
+                    <li><a href="docs/DEVELOPER_GUIDE.md">Developer Guide</a></li>
+                    <li><a href="README.md">Documentation</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 RoomOS. All rights reserved.</p>
+            <p style="color: var(--text-secondary); font-size: 20px;">Developed by Aditya Singh</p>
+            <div class="footer-links">
+                <a href="#" style="text-decoration: none; color: var(--text-primary);">Privacy Policy</a>
+                <a href="#" style="text-decoration: none; color: var(--text-primary);">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
